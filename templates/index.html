@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>Khushi Insta Downloader</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    font-family: Arial, sans-serif;
+  }
+  .box {
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  input {
+    width: 90%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+  }
+  button {
+    margin-top: 15px;
+    padding: 13px 25px;
+    background: #d62976;
+    color: white;
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:disabled {
+    background: #999;
+  }
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>💖 Khushi Insta Downloader</h2>
+  <p>Instagram Reel का लिंक डालें</p>
+  <input id="url" placeholder="Paste Instagram link here">
+  <br>
+  <button id="btn" onclick="downloadReel()">Download Video</button>
+  <p id="msg"></p>
+</div>
+
+<script>
+async function downloadReel() {
+  let url = document.getElementById("url").value.trim();
+  let msg = document.getElementById("msg");
+  let btn = document.getElementById("btn");
+
+  if (!/^https?:\/\/(www\.)?instagram\.com\//i.test(url)) {
+    msg.innerText = "सही Instagram लिंक डालें!";
+    return;
+  }
+
+  msg.innerText = "वीडियो तैयार हो रहा है, कृपया प्रतीक्षा करें...";
+  btn.disabled = true;
+
+  try {
+    let response = await fetch("/download", {      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: url })
+    });
+
+    let data = await response.json();
+
+    if (data.video_url) {
+      msg.innerText = "डाउनलोड शुरू हो गया है!";
+      window.open(data.video_url, "_blank");
+    } else {
+      msg.innerText = "त्रुटि: " + (data.error || "वीडियो नहीं मिला (पब्लिक Reel ही डालें)");
+    }
+  } catch (err) {
+    msg.innerText = "सर्वर चालू नहीं है! पहले Python सर्वर चलाएं।";
+  }
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
